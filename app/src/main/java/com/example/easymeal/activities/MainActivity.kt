@@ -1,11 +1,11 @@
-package com.example.easymeal
+package com.example.easymeal.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
+import com.example.easymeal.R
 import com.example.easymeal.databinding.ActivityMainBinding
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navController = Navigation.findNavController(this,R.id.host_fragment)
+        val navController = Navigation.findNavController(this, R.id.host_fragment)
         NavigationUI.setupWithNavController(binding.btmNav,navController)
     }
 }
