@@ -1,9 +1,12 @@
 package com.example.easymeal.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.easymeal.data.Categories
+import com.example.easymeal.data.Category
 import com.example.easymeal.data.Meal
 import com.example.easymeal.data.MealList
 import com.example.easymeal.retrofit.MealAPI
@@ -13,28 +16,39 @@ import java.lang.Exception
 
 class MealsViewModel: ViewModel() {
 
+    //Random meal Success live data
     private val randomMealsLiveData = MutableLiveData<Meal>()
     val randomMeals: LiveData<Meal>
          get() {
              return randomMealsLiveData
          }
 
-    private val errorRandomMealsLiveData = MutableLiveData<String>()
-    val errorRandomMeals: LiveData<String>
-         get() {
-             return errorRandomMealsLiveData
-         }
-
+    //Meal Details Success live data
     private val mealDetailsLiveData = MutableLiveData<Meal>()
     val mealDetails: LiveData<Meal>
         get() {
             return mealDetailsLiveData
         }
 
-    private val errorMealDetailsLiveData = MutableLiveData<String>()
-    val errorMealDetails: LiveData<String>
+    //Random items Success live data
+    private val popularItemsLiveData = MutableLiveData<List<Meal>>()
+    val popularItems: LiveData<List<Meal>>
         get() {
-            return errorMealDetailsLiveData
+            return popularItemsLiveData
+        }
+
+    //Categories Success live data
+    private val categoriesLiveData = MutableLiveData<List<Category>>()
+    val categories: LiveData<List<Category>>
+        get() {
+            return categoriesLiveData
+        }
+
+    //Category Meals Success live data
+    private val categoryMealsLiveData = MutableLiveData<List<Meal>>()
+    val categoryMeals: LiveData<List<Meal>>
+        get() {
+            return categoryMealsLiveData
         }
 
     private val retrofitInstance: MealAPI = RetrofitBuilder.getRetrofit().create(MealAPI::class.java)
@@ -44,11 +58,10 @@ class MealsViewModel: ViewModel() {
             val randomMeal = retrofitInstance.getRandomMeal()
             try {
                 if(randomMeal.isSuccessful) randomMealsLiveData.value = randomMeal.body()?.meals?.get(0)
-                else errorRandomMealsLiveData.value = randomMeal.errorBody().toString()
+                else Log.i("Random Meal Error", randomMeal.errorBody().toString())
             } catch (e: Exception) {
-                errorRandomMealsLiveData.value = e.message.toString()
+                Log.i("Random Meal Error", randomMeal.errorBody().toString())
             }
-
         }
     }
 
@@ -57,9 +70,45 @@ class MealsViewModel: ViewModel() {
             val mealDetails = retrofitInstance.getMealDetails(mealId)
             try {
                 if(mealDetails.isSuccessful) mealDetailsLiveData.value = mealDetails.body()?.meals?.get(0)
-                else errorMealDetailsLiveData.value = mealDetails.errorBody().toString()
+                else Log.i("Meal Details Error", mealDetails.errorBody().toString())
             }catch (e: Exception){
-                errorMealDetailsLiveData.value = e.message.toString()
+                Log.i("Meal Details Error", mealDetails.errorBody().toString())
+            }
+        }
+    }
+
+    fun getPopularItems(category: String){
+        viewModelScope.launch {
+            val popularItems = retrofitInstance.getPopularItems(category)
+            try {
+                if(popularItems.isSuccessful) popularItemsLiveData.value = popularItems.body()?.meals
+                else Log.i("Popular Items Error", popularItems.errorBody().toString())
+            }catch (e: Exception){
+                Log.i("Popular Items Error", popularItems.errorBody().toString())
+            }
+        }
+    }
+
+    fun getCategories(){
+        viewModelScope.launch {
+            val categories = retrofitInstance.getCategories()
+            try {
+                if(categories.isSuccessful) categoriesLiveData.value = categories.body()?.categories
+                else Log.i("Categories Error", categories.errorBody().toString())
+            }catch (e: Exception){
+                Log.i("Categories Error", categories.errorBody().toString())
+            }
+        }
+    }
+
+    fun getCategoryMeals(category: String){
+        viewModelScope.launch {
+            val categoryMeals = retrofitInstance.getCategoryMeals(category)
+            try {
+                if(categoryMeals.isSuccessful) categoryMealsLiveData.value = categoryMeals.body()?.meals
+                else Log.i("Category Meals Error", categoryMeals.errorBody().toString())
+            }catch (e: Exception){
+                Log.i("Category Meals Error", categoryMeals.errorBody().toString())
             }
         }
     }
