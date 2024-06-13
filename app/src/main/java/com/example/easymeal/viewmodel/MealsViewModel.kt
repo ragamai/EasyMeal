@@ -59,6 +59,13 @@ class MealsViewModel(val mealDatabase: MealDatabase): ViewModel() {
             return favoriteMealsLiveData
         }
 
+    //Search Meals live data
+    private val searchMealsLiveData = MutableLiveData<List<Meal>>()
+    val searchMeals: LiveData<List<Meal>>
+        get() {
+            return searchMealsLiveData
+        }
+
     private val retrofitInstance: MealAPI = RetrofitBuilder.getRetrofit().create(MealAPI::class.java)
 
     fun getRandomMeals(){
@@ -117,6 +124,18 @@ class MealsViewModel(val mealDatabase: MealDatabase): ViewModel() {
                 else Log.i("Category Meals Error", categoryMeals.errorBody().toString())
             }catch (e: Exception){
                 Log.i("Category Meals Error", categoryMeals.errorBody().toString())
+            }
+        }
+    }
+
+    fun getSearchMeals(searchText: String){
+        viewModelScope.launch {
+            val searchMeals = retrofitInstance.getSearchMeals(searchText)
+            try {
+                if(searchMeals.isSuccessful) searchMealsLiveData.value = searchMeals.body()?.meals
+                else Log.i("Search Meals Error", searchMeals.errorBody().toString())
+            }catch (e: Exception){
+                Log.i("Search Meals Error", searchMeals.errorBody().toString())
             }
         }
     }

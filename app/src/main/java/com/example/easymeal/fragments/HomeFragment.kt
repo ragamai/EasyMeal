@@ -8,10 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.example.easymeal.R
 import com.example.easymeal.activities.CategoryMealActivity
+import com.example.easymeal.activities.MainActivity
 import com.example.easymeal.activities.MealActivity
 import com.example.easymeal.adapters.CategoriesAdapter
 import com.example.easymeal.adapters.PopularItemsAdapter
@@ -43,9 +46,7 @@ class HomeFragment : Fragment(), PopularItemsAdapter.PopularItemClicked, Categor
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val mealDatabase = MealDatabase.getInstance(requireActivity().applicationContext)
-        val viewModelFactory = MealViewModelFactory(mealDatabase)
-        mealsViewModel = ViewModelProvider(this, viewModelFactory)[MealsViewModel::class.java]
+        mealsViewModel = (activity as MainActivity).mealsViewModel
     }
 
     override fun onCreateView(
@@ -59,6 +60,10 @@ class HomeFragment : Fragment(), PopularItemsAdapter.PopularItemClicked, Categor
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.ivSearch.setOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_searchFragment)
+        }
 
         callRandomMeals()
         onRandomMealClicked()

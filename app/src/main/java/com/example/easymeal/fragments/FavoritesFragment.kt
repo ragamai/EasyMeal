@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.easymeal.R
+import com.example.easymeal.activities.MainActivity
 import com.example.easymeal.activities.MealActivity
 import com.example.easymeal.adapters.FavoriteAdapter
 import com.example.easymeal.data.Meal
@@ -36,11 +37,7 @@ class FavoritesFragment : Fragment(), FavoriteAdapter.OnFavoriteMealClicked {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val database = MealDatabase.getInstance(requireContext())
-        val viewModelFactory = MealViewModelFactory(database)
-        mealsViewModel = ViewModelProvider(this, viewModelFactory)[MealsViewModel::class.java]
-
-        getFavoriteMeals()
+        mealsViewModel = (activity as MainActivity).mealsViewModel
     }
 
     override fun onCreateView(
@@ -52,8 +49,14 @@ class FavoritesFragment : Fragment(), FavoriteAdapter.OnFavoriteMealClicked {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        getFavoriteMeals()
+    }
+
     private fun getFavoriteMeals(){
-        mealsViewModel.getFavoriteMeal().observe(this){
+        mealsViewModel.getFavoriteMeal().observe(requireActivity()){
             favMealsAdapter = FavoriteAdapter(it, this)
             binding.rvFavoriteMeals.apply {
                 layoutManager = GridLayoutManager(activity, 2,GridLayoutManager.VERTICAL, false)
@@ -63,7 +66,7 @@ class FavoritesFragment : Fragment(), FavoriteAdapter.OnFavoriteMealClicked {
     }
 
     override fun onMealClicked(meal: Meal) {
-        val intent = Intent(activity, MealActivity::class.java)
+        val intent = Intent(requireActivity(), MealActivity::class.java)
         intent.putExtra(HomeFragment.MEAL_ID, meal.idMeal)
         startActivity(intent)
     }
