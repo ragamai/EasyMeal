@@ -17,7 +17,9 @@ import com.example.easymeal.adapters.CategoriesAdapter
 import com.example.easymeal.adapters.PopularItemsAdapter
 import com.example.easymeal.data.Category
 import com.example.easymeal.data.Meal
+import com.example.easymeal.database.MealDatabase
 import com.example.easymeal.databinding.FragmentHomeBinding
+import com.example.easymeal.viewmodel.MealViewModelFactory
 import com.example.easymeal.viewmodel.MealsViewModel
 
 /**
@@ -41,7 +43,9 @@ class HomeFragment : Fragment(), PopularItemsAdapter.PopularItemClicked, Categor
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mealsViewModel = ViewModelProvider(this)[MealsViewModel::class.java]
+        val mealDatabase = MealDatabase.getInstance(requireActivity().applicationContext)
+        val viewModelFactory = MealViewModelFactory(mealDatabase)
+        mealsViewModel = ViewModelProvider(this, viewModelFactory)[MealsViewModel::class.java]
     }
 
     override fun onCreateView(

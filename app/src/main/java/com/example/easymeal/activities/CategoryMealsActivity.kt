@@ -7,8 +7,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.easymeal.adapters.CategoryMealsAdapter
 import com.example.easymeal.data.Meal
+import com.example.easymeal.database.MealDatabase
 import com.example.easymeal.databinding.ActivityCategoryMealsBinding
 import com.example.easymeal.fragments.HomeFragment
+import com.example.easymeal.viewmodel.MealViewModelFactory
 import com.example.easymeal.viewmodel.MealsViewModel
 
 class CategoryMealActivity : AppCompatActivity(), CategoryMealsAdapter.CategoryMealClicked {
@@ -22,7 +24,9 @@ class CategoryMealActivity : AppCompatActivity(), CategoryMealsAdapter.CategoryM
         binding = ActivityCategoryMealsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        mealsViewModel = ViewModelProvider(this)[MealsViewModel::class.java]
+        val database = MealDatabase.getInstance(this)
+        val viewModelFactory = MealViewModelFactory(database)
+        mealsViewModel = ViewModelProvider(this, viewModelFactory)[MealsViewModel::class.java]
         getCategoryMeals()
     }
 

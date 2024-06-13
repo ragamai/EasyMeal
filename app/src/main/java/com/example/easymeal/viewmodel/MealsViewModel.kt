@@ -9,12 +9,13 @@ import com.example.easymeal.data.Categories
 import com.example.easymeal.data.Category
 import com.example.easymeal.data.Meal
 import com.example.easymeal.data.MealList
+import com.example.easymeal.database.MealDatabase
 import com.example.easymeal.retrofit.MealAPI
 import com.example.easymeal.retrofit.RetrofitBuilder
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
-class MealsViewModel: ViewModel() {
+class MealsViewModel(val mealDatabase: MealDatabase): ViewModel() {
 
     //Random meal Success live data
     private val randomMealsLiveData = MutableLiveData<Meal>()
@@ -49,6 +50,13 @@ class MealsViewModel: ViewModel() {
     val categoryMeals: LiveData<List<Meal>>
         get() {
             return categoryMealsLiveData
+        }
+
+    //Favorite Meals live data
+    private val favoriteMealsLiveData = MutableLiveData<List<Meal>>()
+    val favoriteMeals: LiveData<List<Meal>>
+        get() {
+            return favoriteMealsLiveData
         }
 
     private val retrofitInstance: MealAPI = RetrofitBuilder.getRetrofit().create(MealAPI::class.java)
@@ -110,6 +118,22 @@ class MealsViewModel: ViewModel() {
             }catch (e: Exception){
                 Log.i("Category Meals Error", categoryMeals.errorBody().toString())
             }
+        }
+    }
+
+    fun insertMeal(meal: Meal){
+        viewModelScope.launch {
+            mealDatabase.mealDao().insertMealInfo(meal)
+        }
+    }
+
+    fun getFavoriteMeal(): LiveData<List<Meal>>{
+        return mealDatabase.mealDao().getMeals()
+    }
+
+    fun deleteMeal(meal: Meal){
+        viewModelScope.launch {
+            mealDatabase.mealDao().deleteMeal(meal)
         }
     }
 }

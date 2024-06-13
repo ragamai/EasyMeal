@@ -4,13 +4,16 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.easymeal.R
 import com.example.easymeal.data.Meal
+import com.example.easymeal.database.MealDatabase
 import com.example.easymeal.databinding.ActivityMealBinding
 import com.example.easymeal.fragments.HomeFragment
+import com.example.easymeal.viewmodel.MealViewModelFactory
 import com.example.easymeal.viewmodel.MealsViewModel
 
 class MealActivity : AppCompatActivity() {
@@ -27,10 +30,13 @@ class MealActivity : AppCompatActivity() {
         mealId = this.intent.getStringExtra(HomeFragment.MEAL_ID).toString()
         getMealDetails()
         setVideoOnClick()
+        onFavoriteClicked()
     }
 
     private fun getMealDetails(){
-        viewModel = ViewModelProvider(this)[MealsViewModel::class.java]
+        val mealDatabase = MealDatabase.getInstance(this)
+        val viewModelFactory = MealViewModelFactory(mealDatabase)
+        viewModel = ViewModelProvider(this, viewModelFactory)[MealsViewModel::class.java]
         viewModel.getMealDetails(mealId)
         viewModel.mealDetails.observe(this){
             setMealDetails(it)
@@ -54,6 +60,13 @@ class MealActivity : AppCompatActivity() {
         binding.fabVideo.setOnClickListener {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(meal.strYoutube))
             startActivity(intent)
+        }
+    }
+
+    private fun onFavoriteClicked() {
+        binding.fabFavorite.setOnClickListener {
+            viewModel.insertMeal(meal)
+            Toast.makeText(this, "Fav Meal Added", Toast.LENGTH_SHORT).show()
         }
     }
 }
